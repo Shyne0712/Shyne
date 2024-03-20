@@ -1,0 +1,159 @@
+using System;
+using System.Windows.Forms;
+
+namespace SortingApp
+{
+    public partial class MainForm : Form
+    {
+        public MainForm()
+        {
+            InitializeComponent();
+        }
+
+        private void btnSort_Click(object sender, EventArgs e)
+        {
+            string[] inputNumbers = txtNumbers.Text.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            int[] numbers = new int[inputNumbers.Length];
+            for (int i = 0; i < inputNumbers.Length; i++)
+            {
+                if (!int.TryParse(inputNumbers[i], out numbers[i]))
+                {
+                    MessageBox.Show("Vui lòng nhập các số nguyên hợp lệ!");
+                    return;
+                }
+            }
+
+            string sortAlgorithm = cmbSortAlgorithm.SelectedItem.ToString();
+            switch (sortAlgorithm)
+            {
+                case "Insertion Sort":
+                    InsertionSort(numbers);
+                    break;
+                case "Selection Sort":
+                    SelectionSort(numbers);
+                    break;
+                case "Bubble Sort":
+                    BubbleSort(numbers);
+                    break;
+                case "Merge Sort":
+                    MergeSort(numbers, 0, numbers.Length - 1);
+                    break;
+                default:
+                    MessageBox.Show("Vui lòng chọn thuật toán sắp xếp!");
+                    return;
+            }
+
+            // Hiển thị kết quả
+            txtSortedNumbers.Text = string.Join(", ", numbers);
+        }
+
+        private void InsertionSort(int[] arr)
+        {
+            for (int i = 1; i < arr.Length; ++i)
+            {
+                int key = arr[i];
+                int j = i - 1;
+
+                while (j >= 0 && arr[j] > key)
+                {
+                    arr[j + 1] = arr[j];
+                    j = j - 1;
+                }
+                arr[j + 1] = key;
+            }
+        }
+
+        private void SelectionSort(int[] arr)
+        {
+            for (int i = 0; i < arr.Length - 1; i++)
+            {
+                int min_index = i;
+                for (int j = i + 1; j < arr.Length; j++)
+                {
+                    if (arr[j] < arr[min_index])
+                    {
+                        min_index = j;
+                    }
+                }
+                int temp = arr[min_index];
+                arr[min_index] = arr[i];
+                arr[i] = temp;
+            }
+        }
+
+        private void BubbleSort(int[] arr)
+        {
+            int n = arr.Length;
+            for (int i = 0; i < n - 1; i++)
+            {
+                for (int j = 0; j < n - i - 1; j++)
+                {
+                    if (arr[j] > arr[j + 1])
+                    {
+                        int temp = arr[j];
+                        arr[j] = arr[j + 1];
+                        arr[j + 1] = temp;
+                    }
+                }
+            }
+        }
+
+        private void Merge(int[] arr, int l, int m, int r)
+        {
+            int n1 = m - l + 1;
+            int n2 = r - m;
+
+            int[] L = new int[n1];
+            int[] R = new int[n2];
+
+            for (int i = 0; i < n1; ++i)
+                L[i] = arr[l + i];
+            for (int j = 0; j < n2; ++j)
+                R[j] = arr[m + 1 + j];
+
+            int k = l;
+            int p = 0, q = 0;
+            while (p < n1 && q < n2)
+            {
+                if (L[p] <= R[q])
+                {
+                    arr[k] = L[p];
+                    p++;
+                }
+                else
+                {
+                    arr[k] = R[q];
+                    q++;
+                }
+                k++;
+            }
+
+            while (p < n1)
+            {
+                arr[k] = L[p];
+                p++;
+                k++;
+            }
+
+            while (q < n2)
+            {
+                arr[k] = R[q];
+                q++;
+                k++;
+            }
+        }
+
+        private void MergeSort(int[] arr, int l, int r)
+        {
+            if (l < r)
+            {
+                int m = l + (r - l) / 2;
+
+                MergeSort(arr, l, m);
+                MergeSort(arr, m + 1, r);
+
+                Merge(arr, l, m, r);
+            }
+        }
+    }
+}
